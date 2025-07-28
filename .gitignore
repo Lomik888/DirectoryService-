@@ -9,6 +9,7 @@
 
 *idea*
 *.idea*
+*backend.sln.DotSettings.user*
 
 # Build results
 [Dd]ebug/
