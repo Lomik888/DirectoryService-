@@ -11,11 +11,11 @@ public class Address : ValueObject
         Value = value;
     }
 
-    public static Result<Address, Error> Create(string value)
+    public static Result<Address, Error.Error> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            var error = Error.Create($"Адрес не может быть пустым");
+            var error = Error.Error.Create($"Адрес не может быть пустым");
             return error;
         }
 
