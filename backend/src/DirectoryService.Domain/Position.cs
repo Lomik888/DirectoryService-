@@ -5,11 +5,11 @@ namespace DirectoryService.Domain;
 
 public sealed class Position : Entity<PositionId>
 {
-    private readonly List<Guid> _departmentIds = [];
+    private readonly List<Department> _departments = [];
 
     public PositionName Name { get; private set; }
 
-    public Description? Description { get; private set; }
+    public Description? Description { get; private set; }  
 
     public bool IsActive { get; private set; }
 
@@ -17,7 +17,7 @@ public sealed class Position : Entity<PositionId>
 
     public DateTime UpdatedAt { get; private set; }
 
-    public IReadOnlyList<Guid> DepartmentIds => _departmentIds;
+    public IReadOnlyList<Department> Departments => _departments;
 
     public Position(
         PositionName name,
