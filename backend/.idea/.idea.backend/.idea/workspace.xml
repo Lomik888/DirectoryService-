@@ -10,8 +10,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0dd26834-eb1d-493b-8ede-217d59dda080" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.backend/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DirectoryService.Domain/DirectoryService.Domain.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/src/DirectoryService.Domain/DirectoryService.Domain.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.backend/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.backend/.idea/indexLayout.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.backend/.idea/projectSettingsUpdater.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.backend/.idea/vcs.xml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +46,8 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/631945f7385caaae97805b4735f2d5f2f8a6187eef69f5c810e4d29232cd949/TimeZoneInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/solov/OneDrive/Рабочий стол/DirectoryService-/backend/src/DirectoryService.Domain/Department.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/solov/OneDrive/Рабочий стол/DirectoryService-/backend/src/DirectoryService.Domain/Position.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -58,7 +63,7 @@
   "keyToString": {
     ".NET Launch Settings Profile.DirectoryService.Presentation: http.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "DS-B-3",
+    "git-widget-placeholder": "#2 on DS-B-3",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -142,7 +147,15 @@
       <option name="project" value="LOCAL" />
       <updated>1752423164861</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Переделал под навигационные свойства">
+      <option name="closed" value="true" />
+      <created>1753707190296</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1753707190296</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -165,6 +178,7 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Добавил едитор конфиг и стайл коп" />
     <MESSAGE value="Базовая структура проекта по CA" />
-    <option name="LAST_COMMIT_MESSAGE" value="Базовая структура проекта по CA" />
+    <MESSAGE value="Переделал под навигационные свойства" />
+    <option name="LAST_COMMIT_MESSAGE" value="Переделал под навигационные свойства" />
   </component>
 </project>

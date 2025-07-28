@@ -9,7 +9,7 @@ public sealed class Position : Entity<PositionId>
 
     public PositionName Name { get; private set; }
 
-    public Description? Description { get; private set; }  
+    public Description? Description { get; private set; }
 
     public bool IsActive { get; private set; }
 
