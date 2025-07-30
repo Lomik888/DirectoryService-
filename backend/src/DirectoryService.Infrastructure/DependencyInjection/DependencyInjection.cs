@@ -1,4 +1,6 @@
+using DirectoryService.Application.Locations;
 using DirectoryService.Infrastructure.Options;
+using DirectoryService.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +12,12 @@ public static class DependencyInjection
     public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDatabase(configuration);
+        services.AddRepositories();
+    }
+
+    private static void AddRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<ILocationRepository, LocationRepository>();
     }
 
     private static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
