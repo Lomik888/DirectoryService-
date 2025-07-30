@@ -22,15 +22,42 @@ public sealed class Location : Entity<LocationId>
 
     public IReadOnlyList<Department> Departments => _departments;
 
-    public Location(
+    private Location(
         LocationName name,
-        Timezone timezone)
+        Timezone timezone,
+        DateTime createdAt)
     {
         Id = LocationId.Create();
         Name = name;
         Timezone = timezone;
         IsActive = true;
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = CreatedAt;
+        CreatedAt = createdAt;
+        UpdatedAt = createdAt;
+    }
+
+    public static Result<Location, Error.Error> Create(
+        LocationName name,
+        Timezone timezone,
+        DateTime createdAt)
+    {
+        if (createdAt.Kind is not DateTimeKind.Utc)
+        {
+            var error = Error.Error.Create($"{nameof(createdAt)} must be UTC.");
+            return error;
+        }
+
+        return new Location(name, timezone, createdAt);
+    }
+
+    public UnitResult<Error.Error> AddAddress(Address address)
+    {
+        if (Addresses.Contains(address))
+        {
+            var error = Error.Error.Create($"{nameof(address)} is already added.");
+            return error;
+        }
+
+        _addresses.Add(address);
+        return UnitResult.Success<Error.Error>();
     }
 }
