@@ -1,4 +1,6 @@
-﻿namespace DirectoryService.Application.Abstractions;
+﻿using DirectoryService.Domain.Abstractions;
+
+namespace DirectoryService.Application.Abstractions;
 
 public class Clock : IClock
 {

@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Abstractions;
 using DirectoryService.Domain.LocationValueObjects;
 
 namespace DirectoryService.Domain;
@@ -25,12 +26,14 @@ public sealed class Location : Entity<LocationId>
     private Location(
         LocationName name,
         Timezone timezone,
+        Address address,
         DateTime createdAt)
     {
         Id = LocationId.Create();
         Name = name;
         Timezone = timezone;
         IsActive = true;
+        _addresses.Add(address);
         CreatedAt = createdAt;
         UpdatedAt = createdAt;
     }
@@ -38,15 +41,18 @@ public sealed class Location : Entity<LocationId>
     public static Result<Location, Error.Error> Create(
         LocationName name,
         Timezone timezone,
-        DateTime createdAt)
+        Address address,
+        IClock clock)
     {
+        var createdAt = clock.UtcNow();
+
         if (createdAt.Kind is not DateTimeKind.Utc)
         {
             var error = Error.Error.Create($"{nameof(createdAt)} must be UTC.");
             return error;
         }
 
-        return new Location(name, timezone, createdAt);
+        return new Location(name, timezone, address, createdAt);
     }
 
     public UnitResult<Error.Error> AddAddress(Address address)

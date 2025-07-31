@@ -1,5 +1,5 @@
 ﻿using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Factories;
+using DirectoryService.Domain.Abstractions;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,18 +11,12 @@ public static class DependencyInjection
     {
         services.AddCommands();
         services.AddClock();
-        services.AddFactories();
         services.AddValidations();
     }
 
     private static void AddValidations(this IServiceCollection services)
     {
         services.AddValidatorsFromAssemblyContaining(typeof(DependencyInjection));
-    }
-
-    private static void AddFactories(this IServiceCollection services)
-    {
-        services.AddSingleton<LocationFactories>();
     }
 
     private static void AddClock(this IServiceCollection services)

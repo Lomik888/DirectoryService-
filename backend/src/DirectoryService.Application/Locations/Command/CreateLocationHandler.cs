@@ -1,7 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Extations;
-using DirectoryService.Application.Factories;
+using DirectoryService.Domain;
+using DirectoryService.Domain.Abstractions;
 using DirectoryService.Domain.Error;
 using DirectoryService.Domain.Extations;
 using DirectoryService.Domain.LocationValueObjects;
@@ -14,19 +15,19 @@ public class CreateLocationHandler : ICommandHandler<Guid, List<Error>, CreateLo
 {
     private readonly IValidator<CreateLocationCommand> _validator;
     private readonly ILogger<CreateLocationHandler> _logger;
-    private readonly LocationFactories _locationFactories;
+    private readonly IClock _clock;
     private readonly ILocationRepository _locationRepository;
 
     public CreateLocationHandler(
         IValidator<CreateLocationCommand> validator,
         ILogger<CreateLocationHandler> logger,
-        LocationFactories locationFactories,
-        ILocationRepository locationRepository)
+        ILocationRepository locationRepository,
+        IClock clock)
     {
         _validator = validator;
         _logger = logger;
-        _locationFactories = locationFactories;
         _locationRepository = locationRepository;
+        _clock = clock;
     }
 
     public async Task<Result<Guid, List<Error>>> HandleAsync(
@@ -48,7 +49,7 @@ public class CreateLocationHandler : ICommandHandler<Guid, List<Error>, CreateLo
             command.AddressDto.HouseNumber,
             command.AddressDto.Number).Value;
 
-        var createLocationResult = _locationFactories.Create(locationName, timeZone);
+        var createLocationResult = Location.Create(locationName, timeZone, address, _clock);
         if (createLocationResult.IsFailure == true)
         {
             _logger.LogInformation("Can't create location");
