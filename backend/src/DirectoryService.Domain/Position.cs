@@ -19,15 +19,30 @@ public sealed class Position : Entity<PositionId>
 
     public IReadOnlyList<Department> Departments => _departments;
 
-    public Position(
+    private Position(
         PositionName name,
-        Description? description)
+        Description? description,
+        DateTime createdAt)
     {
         Id = PositionId.Create();
         Name = name;
         Description = description;
         IsActive = true;
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = CreatedAt;
+        CreatedAt = createdAt;
+        UpdatedAt = createdAt;
+    }
+
+    public static Result<Position, Error.Error> Create(
+        PositionName name,
+        Description? description,
+        DateTime createdAt)
+    {
+        if (createdAt.Kind is not DateTimeKind.Utc)
+        {
+            var error = Error.Error.Create($"{nameof(createdAt)} must be UTC.");
+            return error;
+        }
+
+        return new Position(name, description, createdAt);
     }
 }
