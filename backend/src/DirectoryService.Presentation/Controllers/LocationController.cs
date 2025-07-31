@@ -9,16 +9,11 @@ namespace DirectoryService.Presentation.Controllers;
 public class LocationController : ApplicationController
 {
     [HttpPost("/locations")]
-    public async Task<ActionResult<Guid>> CreateAsync(
+    public async Task<CustomResult<Guid>> CreateAsync(
         [FromBody] CreateLocationRequest request,
-        [FromServices] ICommandHandler<Guid, List<Error>, CreateLocationCommand> handler)
+        [FromServices] ICommandHandler<Guid, Errors, CreateLocationCommand> handler,
+        CancellationToken cancellationToken)
     {
-        var command = new CreateLocationCommand(request);
-        var requestResult = await handler.HandleAsync(command, CancellationToken.None);
-
-        if (requestResult.IsFailure == true)
-            return BadRequest(requestResult.Error);
-
-        return Ok(requestResult.Value);
+        return (await handler.HandleAsync(request, cancellationToken), StatusCodes.Status201Created);
     }
 }
