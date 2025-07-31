@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Abstractions;
+using DirectoryService.Domain.Error;
 using DirectoryService.Domain.LocationValueObjects;
 
 namespace DirectoryService.Domain;
@@ -22,6 +23,10 @@ public sealed class Location : Entity<LocationId>
     public IReadOnlyList<Address> Addresses => _addresses;
 
     public IReadOnlyList<Department> Departments => _departments;
+
+    private Location()
+    {
+    }
 
     private Location(
         LocationName name,
@@ -48,7 +53,10 @@ public sealed class Location : Entity<LocationId>
 
         if (createdAt.Kind is not DateTimeKind.Utc)
         {
-            var error = Error.Error.Create($"{nameof(createdAt)} must be UTC.");
+            var error = Error.Error.Create(
+                $"{nameof(createdAt)} must be UTC.",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION);
             return error;
         }
 
@@ -59,7 +67,10 @@ public sealed class Location : Entity<LocationId>
     {
         if (Addresses.Contains(address))
         {
-            var error = Error.Error.Create($"{nameof(address)} is already added.");
+            var error = Error.Error.Create(
+                $"{nameof(address)} is already added.",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION);
             return error;
         }
 

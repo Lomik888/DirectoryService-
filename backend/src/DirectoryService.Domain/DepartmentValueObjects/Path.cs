@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Error;
 
 namespace DirectoryService.Domain.DepartmentValueObjects;
 
@@ -22,13 +23,19 @@ public class Path : ValueObject
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            var error = Error.Error.Create("Путь департамента не может быть пустым");
+            var error = Error.Error.Create(
+                "Путь департамента не может быть пустым",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION);
             errors.Add(error);
         }
 
         if (_pathRegex.IsMatch(value) == false)
         {
-            var error = Error.Error.Create($"Путь департамента невалидный");
+            var error = Error.Error.Create(
+                $"Путь департамента невалидный",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION);
             errors.Add(error);
             return errors;
         }

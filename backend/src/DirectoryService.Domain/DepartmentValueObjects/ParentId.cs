@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Error;
 
 namespace DirectoryService.Domain.DepartmentValueObjects;
 
@@ -15,7 +16,10 @@ public class ParentId : ValueObject
     {
         if (value == Guid.Empty)
         {
-            return Error.Error.Create("Guid пустой");
+            return Error.Error.Create(
+                "Guid пустой",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION);
         }
 
         return new ParentId(value);
