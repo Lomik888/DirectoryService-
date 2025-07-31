@@ -41,13 +41,13 @@ public class CreateLocationHandler : ICommandHandler<Guid, List<Error>, CreateLo
             return validationResult.Errors.ToErrors();
         }
 
-        var locationName = LocationName.Create(command.LocationName).Value;
-        var timeZone = Timezone.Create(command.TimeZone).Value;
+        var locationName = LocationName.Create(command.Request.LocationName).Value;
+        var timeZone = Timezone.Create(command.Request.TimeZone).Value;
         var address = Address.Create(
-            command.AddressDto.City,
-            command.AddressDto.Street,
-            command.AddressDto.HouseNumber,
-            command.AddressDto.Number).Value;
+            command.Request.City,
+            command.Request.Street,
+            command.Request.HouseNumber,
+            command.Request.Number).Value;
 
         var createLocationResult = Location.Create(locationName, timeZone, address, _clock);
         if (createLocationResult.IsFailure == true)

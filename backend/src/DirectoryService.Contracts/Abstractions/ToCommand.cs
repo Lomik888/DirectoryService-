@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Presentation.Abstractions;
+﻿namespace DirectoryService.Contracts.Abstractions;
 
 public interface IToCommand<TParam, TCommand>
 {
