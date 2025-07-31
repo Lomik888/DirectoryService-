@@ -11,11 +11,11 @@ public class ParentId : ValueObject
         Value = value;
     }
 
-    public static Result<ParentId, Error> Create(Guid value)
+    public static Result<ParentId, Error.Error> Create(Guid value)
     {
         if (value == Guid.Empty)
         {
-            return Error.Create("Guid пустой");
+            return Error.Error.Create("Guid пустой");
         }
 
         return new ParentId(value);

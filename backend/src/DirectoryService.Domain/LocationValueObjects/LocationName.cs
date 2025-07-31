@@ -14,19 +14,19 @@ public class LocationName : ValueObject
         Value = value;
     }
 
-    public static Result<LocationName, IEnumerable<Error>> Create(string value)
+    public static Result<LocationName, IEnumerable<Error.Error>> Create(string value)
     {
-        var errors = new List<Error>();
+        var errors = new List<Error.Error>();
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            var error = Error.Create("Имя локации не может быть пустым");
+            var error = Error.Error.Create("Имя локации не может быть пустым");
             errors.Add(error);
         }
 
         if (value.Length < NAME_MIN_LENGHT || value.Length > NAME_MAX_LENGHT)
         {
-            var error = Error.Create($"Имя локации должно быть {NAME_MIN_LENGHT}-{NAME_MAX_LENGHT} симвалов");
+            var error = Error.Error.Create($"Имя локации должно быть {NAME_MIN_LENGHT}-{NAME_MAX_LENGHT} симвалов");
             errors.Add(error);
             return errors;
         }

@@ -13,11 +13,11 @@ public class Description : ValueObject
         Value = value;
     }
 
-    public static Result<Description, Error> Create(string value)
+    public static Result<Description, Error.Error> Create(string value)
     {
         if (value.Length > DESCRIPTION_MAX_LENGHT)
         {
-            var error = Error.Create($"Описание должно быть не больше {DESCRIPTION_MAX_LENGHT} симвалов");
+            var error = Error.Error.Create($"Описание должно быть не больше {DESCRIPTION_MAX_LENGHT} симвалов");
             return error;
         }
 

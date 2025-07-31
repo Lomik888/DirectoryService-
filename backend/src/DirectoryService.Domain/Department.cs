@@ -34,18 +34,35 @@ public sealed class Department : Entity<DepartmentId>
 
     public IReadOnlyList<Position> Positions => _positions;
 
-    public Department(
+    private Department(
         DepartmentName name,
         Identifier identifier,
-        Path path)
+        Path path,
+        DateTime createdAt)
     {
         Id = DepartmentId.Create();
         Name = name;
+        Identifier = identifier;
         IsActive = true;
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = CreatedAt;
+        CreatedAt = createdAt;
+        UpdatedAt = createdAt;
         ChildrenCount = ChildrenDepartments.Count;
         Path = path;
         Depth = Path.GetDepth();
+    }
+
+    public static Result<Department, Error.Error> Create(
+        DepartmentName name,
+        Identifier identifier,
+        Path path,
+        DateTime createdAt)
+    {
+        if (createdAt.Kind is not DateTimeKind.Utc)
+        {
+            var error = Error.Error.Create($"{nameof(createdAt)} must be UTC.");
+            return error;
+        }
+
+        return new Department(name, identifier, path, createdAt);
     }
 }

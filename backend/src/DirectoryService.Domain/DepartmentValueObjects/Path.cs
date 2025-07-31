@@ -16,19 +16,19 @@ public class Path : ValueObject
         Value = value;
     }
 
-    public static Result<Path, IEnumerable<Error>> Create(string value)
+    public static Result<Path, IEnumerable<Error.Error>> Create(string value)
     {
-        var errors = new List<Error>();
+        var errors = new List<Error.Error>();
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            var error = Error.Create("Путь департамента не может быть пустым");
+            var error = Error.Error.Create("Путь департамента не может быть пустым");
             errors.Add(error);
         }
 
         if (_pathRegex.IsMatch(value) == false)
         {
-            var error = Error.Create($"Путь департамента невалидный");
+            var error = Error.Error.Create($"Путь департамента невалидный");
             errors.Add(error);
             return errors;
         }

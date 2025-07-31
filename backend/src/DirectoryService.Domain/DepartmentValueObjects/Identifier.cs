@@ -14,20 +14,20 @@ public class Identifier : ValueObject
         Value = value;
     }
 
-    public static Result<Identifier, IEnumerable<Error>> Create(string value)
+    public static Result<Identifier, IEnumerable<Error.Error>> Create(string value)
     {
-        var errors = new List<Error>();
+        var errors = new List<Error.Error>();
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            var error = Error.Create("Идентификатор не может быть пустым");
+            var error = Error.Error.Create("Идентификатор не может быть пустым");
             errors.Add(error);
         }
 
         if (value.Length < IDENTIFIER_MIN_LENGHT || value.Length > IDENTIFIER_MAX_LENGHT)
         {
             var error =
-                Error.Create($"Идентификатор должно быть {IDENTIFIER_MIN_LENGHT}-{IDENTIFIER_MAX_LENGHT} симвалов");
+                Error.Error.Create($"Идентификатор должно быть {IDENTIFIER_MIN_LENGHT}-{IDENTIFIER_MAX_LENGHT} симвалов");
             errors.Add(error);
             return errors;
         }
