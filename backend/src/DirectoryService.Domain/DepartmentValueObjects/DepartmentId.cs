@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Error;
 
 namespace DirectoryService.Domain.DepartmentValueObjects;
 
@@ -17,7 +18,7 @@ public class DepartmentId : ComparableValueObject
     {
         if (value == Guid.Empty)
         {
-            return Error.Error.Create("Guid пустой");
+            return Error.Error.Create("Guid пустой", "invalid.parameter", ErrorTypes.VALIDATION);
         }
 
         return new DepartmentId(value);

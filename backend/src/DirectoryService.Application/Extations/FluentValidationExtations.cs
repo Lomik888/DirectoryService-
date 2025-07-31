@@ -22,14 +22,15 @@ public static class FluentValidationExtations
 
             foreach (var error in result.Error)
             {
-                context.AddFailure(error.Message);
+                var errorString = error.Serialize();
+                context.AddFailure(errorString);
             }
         });
     }
 
     public static List<Error> ToErrors(this List<ValidationFailure> validationFailures)
     {
-        var errors = validationFailures.Select(x => Error.Create(x.ErrorMessage));
-        return errors.ToList();
+        var errors = validationFailures.Select(x => Error.Deserialize(x.ErrorMessage)).ToList();
+        return errors;
     }
 }

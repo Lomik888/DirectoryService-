@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.DepartmentValueObjects;
+using DirectoryService.Domain.Error;
 using Path = DirectoryService.Domain.DepartmentValueObjects.Path;
 
 namespace DirectoryService.Domain;
@@ -59,7 +60,10 @@ public sealed class Department : Entity<DepartmentId>
     {
         if (createdAt.Kind is not DateTimeKind.Utc)
         {
-            var error = Error.Error.Create($"{nameof(createdAt)} must be UTC.");
+            var error = Error.Error.Create(
+                $"{nameof(createdAt)} must be UTC.",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION);
             return error;
         }
 
