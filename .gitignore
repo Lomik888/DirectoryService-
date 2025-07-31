@@ -7,7 +7,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
+*idea*
 *.idea*
+*backend.sln.DotSettings.user*
 
 # Build results
 [Dd]ebug/
