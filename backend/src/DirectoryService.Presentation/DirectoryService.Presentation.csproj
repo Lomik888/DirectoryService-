@@ -6,6 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <UserSecretsId>25904789-4296-4854-b701-25125fa42699</UserSecretsId>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <DocumentationFile>bin\Debug\net8.0\DSApi.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>

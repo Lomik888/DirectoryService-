@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Error;
 
 namespace DirectoryService.Domain.DepartmentValueObjects;
 
@@ -20,14 +21,20 @@ public class Identifier : ValueObject
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            var error = Error.Error.Create("Идентификатор не может быть пустым");
+            var error = Error.Error.Create(
+                "Идентификатор не может быть пустым",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION);
             errors.Add(error);
         }
 
         if (value.Length < IDENTIFIER_MIN_LENGHT || value.Length > IDENTIFIER_MAX_LENGHT)
         {
             var error =
-                Error.Error.Create($"Идентификатор должно быть {IDENTIFIER_MIN_LENGHT}-{IDENTIFIER_MAX_LENGHT} симвалов");
+                Error.Error.Create(
+                    $"Идентификатор должно быть {IDENTIFIER_MIN_LENGHT}-{IDENTIFIER_MAX_LENGHT} симвалов",
+                    "invalid.parameter",
+                    ErrorTypes.VALIDATION);
             errors.Add(error);
             return errors;
         }

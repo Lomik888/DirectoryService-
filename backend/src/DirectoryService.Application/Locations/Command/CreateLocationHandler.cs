@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Locations.Command;
 
-public class CreateLocationHandler : ICommandHandler<Guid, List<Error>, CreateLocationCommand>
+public class CreateLocationHandler : ICommandHandler<Guid, Errors, CreateLocationCommand>
 {
     private readonly IValidator<CreateLocationCommand> _validator;
     private readonly ILogger<CreateLocationHandler> _logger;
@@ -30,7 +30,7 @@ public class CreateLocationHandler : ICommandHandler<Guid, List<Error>, CreateLo
         _clock = clock;
     }
 
-    public async Task<Result<Guid, List<Error>>> HandleAsync(
+    public async Task<Result<Guid, Errors>> HandleAsync(
         CreateLocationCommand command,
         CancellationToken cancellationToken)
     {
@@ -38,7 +38,7 @@ public class CreateLocationHandler : ICommandHandler<Guid, List<Error>, CreateLo
         if (validationResult.IsValid == false)
         {
             _logger.LogInformation("Invalid validation");
-            return validationResult.Errors.ToErrors();
+            return Errors.Create(validationResult.Errors.ToErrors());
         }
 
         var locationName = LocationName.Create(command.Request.LocationName).Value;
@@ -53,17 +53,10 @@ public class CreateLocationHandler : ICommandHandler<Guid, List<Error>, CreateLo
         if (createLocationResult.IsFailure == true)
         {
             _logger.LogInformation("Can't create location");
-            return createLocationResult.Error.ToList();
+            return Errors.Create(validationResult.Errors.ToErrors());
         }
 
         var location = createLocationResult.Value;
-
-        var addAddressResult = location.AddAddress(address);
-        if (addAddressResult.IsFailure == true)
-        {
-            _logger.LogInformation("Can't added address to location");
-            return addAddressResult.Error.ToList();
-        }
 
         await _locationRepository.AddAsync(location, cancellationToken);
         await _locationRepository.SaveChangesAsync(cancellationToken);

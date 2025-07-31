@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Error;
 
 namespace DirectoryService.Domain.PositionValueObjects;
 
@@ -17,7 +18,10 @@ public class Description : ValueObject
     {
         if (value.Length > DESCRIPTION_MAX_LENGHT)
         {
-            var error = Error.Error.Create($"Описание должно быть не больше {DESCRIPTION_MAX_LENGHT} симвалов");
+            var error = Error.Error.Create(
+                $"Описание должно быть не больше {DESCRIPTION_MAX_LENGHT} симвалов",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION);
             return error;
         }
 
