@@ -1,0 +1,21 @@
+﻿services:
+  #  directoryservice.presentation:
+  #    image: directoryservice.presentation
+  #    build:
+  #      context: .
+  #      dockerfile: src/DirectoryService.Presentation/Dockerfile
+  
+  psql:
+    container_name: ds-psql
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5440:5432"
+    volumes:
+      - postgres-volume:/var/lib/psql/data
+
+volumes:
+  postgres-volume:

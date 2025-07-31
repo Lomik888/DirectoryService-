@@ -14,13 +14,13 @@ public sealed class Department : Entity<DepartmentId>
 
     public Identifier Identifier { get; private set; }
 
-    public ParentId? ParentId { get; private set; }
+    public DepartmentId? ParentId { get; private set; }
 
     public Path Path { get; private set; }
 
-    public short Depth => Path.GetDepth();
+    public short Depth { get; private set; }
 
-    public int ChildrenCount => ChildrenDepartments.Count;
+    public int ChildrenCount { get; private set; }
 
     public bool IsActive { get; private set; }
 
@@ -36,12 +36,16 @@ public sealed class Department : Entity<DepartmentId>
 
     public Department(
         DepartmentName name,
-        Identifier identifier)
+        Identifier identifier,
+        Path path)
     {
         Id = DepartmentId.Create();
         Name = name;
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = CreatedAt;
+        ChildrenCount = ChildrenDepartments.Count;
+        Path = path;
+        Depth = Path.GetDepth();
     }
 }
