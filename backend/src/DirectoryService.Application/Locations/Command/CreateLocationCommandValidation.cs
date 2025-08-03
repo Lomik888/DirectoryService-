@@ -9,11 +9,11 @@ public class CreateLocationCommandValidation : AbstractValidator<CreateLocationC
     public CreateLocationCommandValidation()
     {
         RuleFor(x => x.Request.LocationName).MustBeValueObject(x =>
-            LocationName.Create(x));
+            LocationName.Validate(x));
 
         RuleFor(x => x.Request).MustBeValueObject(x =>
-            Address.Create(x.City, x.Street, x.HouseNumber, x.Number));
+            Address.Validate(x.City, x.Street, x.HouseNumber, x.Number));
 
-        RuleFor(x => x.Request.TimeZone).MustBeValueObject(x => Timezone.Create(x));
+        RuleFor(x => x.Request.TimeZone).MustBeValueObject(x => Timezone.Validate(x));
     }
 }
