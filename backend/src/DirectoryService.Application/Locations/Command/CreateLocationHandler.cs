@@ -17,20 +17,17 @@ public class CreateLocationHandler : ICommandHandler<Guid, Errors, CreateLocatio
     private readonly ILogger<CreateLocationHandler> _logger;
     private readonly IClock _clock;
     private readonly ILocationRepository _locationRepository;
-    private readonly ITransactionManager _transactionManager;
 
     public CreateLocationHandler(
         IValidator<CreateLocationCommand> validator,
         ILogger<CreateLocationHandler> logger,
         ILocationRepository locationRepository,
-        IClock clock,
-        ITransactionManager transactionManager)
+        IClock clock)
     {
         _validator = validator;
         _logger = logger;
         _locationRepository = locationRepository;
         _clock = clock;
-        _transactionManager = transactionManager;
     }
 
     public async Task<Result<Guid, Errors>> HandleAsync(
@@ -52,66 +49,39 @@ public class CreateLocationHandler : ICommandHandler<Guid, Errors, CreateLocatio
             command.Request.HouseNumber,
             command.Request.Number).Value;
 
-        var transactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
-        if (transactionResult.IsFailure == true)
-        {
-            return transactionResult.Error;
-        }
-
-        await using var transaction = transactionResult.Value;
-
-        try
-        {
-            var locationExists =
-                await _locationRepository.LocationExistsAsync(
-                    locationName,
-                    address,
-                    cancellationToken);
-            if (locationExists == true)
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                var error = GeneralErrors.Validation.AllreadyExists(
-                    $"Локаия {locationName.Value} {address.FullAddress(locationName.Value)} уже сущестует",
-                    "location.existentialists");
-
-                return Errors.Create(error.ToList());
-            }
-
-            var locationResult = CreateLocation(
+        var locationExists =
+            await _locationRepository.LocationExistsAsync(
                 locationName,
-                timeZone,
-                address, _clock);
-            if (locationResult.IsFailure == true)
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                var error = GeneralErrors.Validation.CanNotCreate("Невозможно создать локацию", "create.location");
-
-                return Errors.Create(error.ToList());
-            }
-
-            var location = locationResult.Value;
-
-            await _locationRepository.AddAsync(location, cancellationToken);
-
-            await transaction.CommitAsync(cancellationToken);
-            await _transactionManager.SaveChangesAsync(cancellationToken);
-
-            _logger.LogInformation("Created location ID : {0}", location.Id.Value);
-            return location.Id.Value;
-        }
-        catch (Exception ex)
+                address,
+                cancellationToken);
+        if (locationExists == true)
         {
-            await transaction.RollbackAsync(cancellationToken);
-            _logger.LogInformation(ex.Message);
+            var errors = GeneralErrors.Validation.AllreadyExists(
+                $"Локаия {locationName.Value} {address.FullAddress(locationName.Value)} уже сущестует",
+                "location.existentialists");
 
-            var error = GeneralErrors.Database.TransactionError(ex.Message);
-
-            return Errors.Create(error.ToList());
+            return Errors.Create(errors.ToList());
         }
-        finally
+
+        var locationResult = CreateLocation(
+            locationName,
+            timeZone,
+            address,
+            _clock);
+        if (locationResult.IsFailure == true)
         {
-            await _transactionManager.DisposeAsync();
+            var errors = GeneralErrors.Validation.CanNotCreate("Невозможно создать локацию", "create.location");
+
+            return Errors.Create(errors.ToList());
         }
+
+        var location = locationResult.Value;
+
+        await _locationRepository.AddAsync(location, cancellationToken);
+        await _locationRepository.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Created location ID : {0}", location.Id.Value);
+        return location.Id.Value;
     }
 
     private Result<Location, Errors> CreateLocation(
