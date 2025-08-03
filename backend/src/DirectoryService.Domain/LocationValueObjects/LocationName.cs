@@ -17,28 +17,35 @@ public class LocationName : ValueObject
 
     public static Result<LocationName, IEnumerable<Error.Error>> Create(string value)
     {
+        var errors = Validate(value);
+
+        if (errors.Count > 0)
+            return errors;
+
+        return new LocationName(value);
+    }
+
+    public static List<Error.Error> Validate(string value)
+    {
         var errors = new List<Error.Error>();
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            var error = Error.Error.Create(
+            errors.Add(Error.Error.Create(
                 "Имя локации не может быть пустым",
                 "invalid.parameter",
-                ErrorTypes.VALIDATION);
-            errors.Add(error);
+                ErrorTypes.VALIDATION));
         }
 
         if (value.Length < NAME_MIN_LENGHT || value.Length > NAME_MAX_LENGHT)
         {
-            var error = Error.Error.Create(
-                $"Имя локации должно быть {NAME_MIN_LENGHT}-{NAME_MAX_LENGHT} симвалов",
+            errors.Add(Error.Error.Create(
+                $"Имя локации должно быть {NAME_MIN_LENGHT}-{NAME_MAX_LENGHT} символов",
                 "invalid.parameter",
-                ErrorTypes.VALIDATION);
-            errors.Add(error);
-            return errors;
+                ErrorTypes.VALIDATION));
         }
 
-        return new LocationName(value);
+        return errors;
     }
 
     protected override IEnumerable<object> GetEqualityComponents()
