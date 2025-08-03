@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Text.Json;
+using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Extations;
 
 namespace DirectoryService.Domain.LocationValueObjects;
@@ -14,6 +15,8 @@ public class Address : ValueObject
     public string? Number { get; init; }
 
     public string FullAddress(string locationName) => $"{locationName} {City} {Street} {HouseNumber} {Number}";
+
+    public string ToJson() => JsonSerializer.Serialize(this, JsonSerializerOptions.Default);
 
     private Address(
         string city,
@@ -33,15 +36,24 @@ public class Address : ValueObject
         string houseNumber,
         string? number)
     {
-        string[] values = number == null ? [city, street, houseNumber] : [city, street, houseNumber, number];
-        var errors = StringExtations.Validation.IsNullOrWhiteSpace(values).ToList();
+        var errors = Validate(city, street, houseNumber, number);
 
         if (errors.Count > 0)
-        {
             return errors;
-        }
 
         return new Address(city, street, houseNumber, number);
+    }
+
+    public static List<Error.Error> Validate(
+        string city,
+        string street,
+        string houseNumber,
+        string? number)
+    {
+        string[] values = number == null ? [city, street, houseNumber] : [city, street, houseNumber, number];
+
+        var errors = StringExtations.Validation.IsNullOrWhiteSpace(values).ToList();
+        return errors;
     }
 
     protected override IEnumerable<object> GetEqualityComponents()
