@@ -1,3 +1,4 @@
+using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Locations;
 using DirectoryService.Infrastructure.Options;
 using DirectoryService.Infrastructure.Repositories;
@@ -25,6 +26,8 @@ public static class DependencyInjection
         var psqlSection = configuration.GetRequiredSection(PsqlOptions.SECTION);
         var connectionString = psqlSection.GetValue<string>(PsqlOptions.CONNECTION_STRING) ??
                                throw new NullReferenceException("Postgres SQL Connection String missing");
+
+        services.AddScoped<ITransactionManager, TransactionManager<DirectoryServiceDbContext>>();
 
         services.AddDbContext<DirectoryServiceDbContext>(options =>
             options.UseNpgsql(connectionString));
