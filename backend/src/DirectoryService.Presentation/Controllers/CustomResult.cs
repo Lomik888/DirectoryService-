@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Error;
+using DirectoryService.Domain.Err;
 using DirectoryService.Presentation.Responses;
 using Microsoft.AspNetCore.Mvc;
 

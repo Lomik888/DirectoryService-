@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using DirectoryService.Domain.Extations;
 
-namespace DirectoryService.Domain.Error;
+namespace DirectoryService.Domain.Err;
 
 public class Errors : IEnumerable<Error>
 {

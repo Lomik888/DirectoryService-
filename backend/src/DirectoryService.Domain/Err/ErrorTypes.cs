@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Domain.Error;
+﻿namespace DirectoryService.Domain.Err;
 
 public enum ErrorTypes
 {

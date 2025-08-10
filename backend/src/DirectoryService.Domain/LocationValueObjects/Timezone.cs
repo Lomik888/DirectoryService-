@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Error;
-using DirectoryService.Domain.Extations;
+using DirectoryService.Domain.Err;
 
 namespace DirectoryService.Domain.LocationValueObjects;
 
@@ -13,7 +12,7 @@ public class Timezone : ValueObject
         Value = value;
     }
 
-    public static Result<Timezone, IEnumerable<Error.Error>> Create(string value)
+    public static Result<Timezone, IEnumerable<Error>> Create(string value)
     {
         var errors = Validate(value);
 
@@ -23,13 +22,13 @@ public class Timezone : ValueObject
         return new Timezone(value);
     }
 
-    public static List<Error.Error> Validate(string value)
+    public static List<Error> Validate(string value)
     {
-        var errors = new List<Error.Error>();
+        var errors = new List<Error>();
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            errors.Add(Error.Error.Create(
+            errors.Add(Error.Create(
                 "Значение временной зоны не может быть пустым",
                 "invalid.parameter",
                 ErrorTypes.VALIDATION));
@@ -40,7 +39,7 @@ public class Timezone : ValueObject
 
         if (!isValid)
         {
-            errors.Add(Error.Error.Create(
+            errors.Add(Error.Create(
                 $"Временная зона с идентификатором '{value}' не найдена",
                 "invalid.parameter",
                 ErrorTypes.VALIDATION));

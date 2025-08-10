@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Error;
+using DirectoryService.Domain.Err;
 
 namespace DirectoryService.Domain.DepartmentValueObjects;
 
@@ -15,13 +15,13 @@ public class DepartmentName : ValueObject
         Value = value;
     }
 
-    public static Result<DepartmentName, IEnumerable<Error.Error>> Create(string value)
+    public static Result<DepartmentName, IEnumerable<Error>> Create(string value)
     {
-        var errors = new List<Error.Error>();
+        var errors = new List<Error>();
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            var error = Error.Error.Create(
+            var error = Error.Create(
                 "Имя департамента не может быть пустым",
                 "invalid.parameter",
                 ErrorTypes.VALIDATION);
@@ -30,7 +30,7 @@ public class DepartmentName : ValueObject
 
         if (value.Length < NAME_MIN_LENGHT || value.Length > NAME_MAX_LENGHT)
         {
-            var error = Error.Error.Create(
+            var error = Error.Create(
                 $"Имя департамента должно быть {NAME_MIN_LENGHT}-{NAME_MAX_LENGHT} симвалов",
                 "invalid.parameter",
                 ErrorTypes.VALIDATION);

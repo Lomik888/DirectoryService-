@@ -1,7 +1,7 @@
 ﻿using System.Data.Common;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
-using DirectoryService.Domain.Error;
+using DirectoryService.Domain.Err;
 using DirectoryService.Domain.Extations;
 using Microsoft.Extensions.Logging;
 

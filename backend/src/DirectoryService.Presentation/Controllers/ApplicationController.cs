@@ -3,7 +3,7 @@
 namespace DirectoryService.Presentation.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api")]
 public class ApplicationController : ControllerBase
 {
 }

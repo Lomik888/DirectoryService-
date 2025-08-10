@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Err;
 using DirectoryService.Domain.Extations;
 
 namespace DirectoryService.Domain.LocationValueObjects;
@@ -30,7 +31,7 @@ public class Address : ValueObject
         Number = number;
     }
 
-    public static Result<Address, IEnumerable<Error.Error>> Create(
+    public static Result<Address, IEnumerable<Error>> Create(
         string city,
         string street,
         string houseNumber,
@@ -44,7 +45,7 @@ public class Address : ValueObject
         return new Address(city, street, houseNumber, number);
     }
 
-    public static List<Error.Error> Validate(
+    public static List<Error> Validate(
         string city,
         string street,
         string houseNumber,

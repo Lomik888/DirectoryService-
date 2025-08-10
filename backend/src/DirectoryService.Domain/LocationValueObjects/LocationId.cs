@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.DepartmentValueObjects;
-using DirectoryService.Domain.Error;
+using DirectoryService.Domain.Err;
 
 namespace DirectoryService.Domain.LocationValueObjects;
 
@@ -15,11 +15,11 @@ public class LocationId : ComparableValueObject
 
     public static LocationId Create() => new LocationId(Guid.NewGuid());
 
-    public static Result<LocationId, Error.Error> Create(Guid value)
+    public static Result<LocationId, Error> Create(Guid value)
     {
         if (value == Guid.Empty)
         {
-            return Error.Error.Create(
+            return Error.Create(
                 "Guid пустой",
                 "invalid.parameter",
                 ErrorTypes.VALIDATION);
