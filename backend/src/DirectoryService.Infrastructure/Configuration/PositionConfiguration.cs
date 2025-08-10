@@ -12,7 +12,7 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
         builder.ToTable("positions", "department");
 
         builder.HasKey(x => x.Id);
-        builder.HasIndex(x => x.Name).IsUnique();
+        builder.HasIndex(x => x.Name).IsUnique().HasFilter(@"""is_active"" = true");
 
         builder.Property(x => x.Id)
             .IsRequired()
