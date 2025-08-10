@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using DirectoryService.Domain.Extations;
 
 namespace DirectoryService.Domain.Error;
 
@@ -25,4 +26,14 @@ public class Errors : IEnumerable<Error>
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public static implicit operator Errors(List<Error> errors)
+    {
+        return new Errors(errors);
+    }
+
+    public static implicit operator Errors(Error error)
+    {
+        return new Errors(error.ToList());
+    }
 }

@@ -15,26 +15,38 @@ public class Timezone : ValueObject
 
     public static Result<Timezone, IEnumerable<Error.Error>> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return Error.Error.Create(
-                "Значение временной зоны не может быть пустым",
-                "invalid.parameter",
-                ErrorTypes.VALIDATION).ToList();
-        }
+        var errors = Validate(value);
 
-        var isValid = TimeZoneInfo.TryFindSystemTimeZoneById(value, out var _);
-
-        if (isValid == false)
-        {
-            var error = Error.Error.Create(
-                $"Временная зона с идентификатором '{value}' не найдена",
-                "invalid.parameter",
-                ErrorTypes.VALIDATION);
-            return error.ToList();
-        }
+        if (errors.Count > 0)
+            return errors;
 
         return new Timezone(value);
+    }
+
+    public static List<Error.Error> Validate(string value)
+    {
+        var errors = new List<Error.Error>();
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            errors.Add(Error.Error.Create(
+                "Значение временной зоны не может быть пустым",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION));
+            return errors;
+        }
+
+        var isValid = TimeZoneInfo.TryFindSystemTimeZoneById(value, out _);
+
+        if (!isValid)
+        {
+            errors.Add(Error.Error.Create(
+                $"Временная зона с идентификатором '{value}' не найдена",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION));
+        }
+
+        return errors;
     }
 
     protected override IEnumerable<object> GetEqualityComponents()
