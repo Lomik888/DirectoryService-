@@ -2,5 +2,7 @@
 
 public enum ErrorTypes
 {
-    VALIDATION
+    VALIDATION,
+    DB,
+    UNKNOWN
 }

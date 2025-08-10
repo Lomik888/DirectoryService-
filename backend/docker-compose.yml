@@ -16,6 +16,15 @@
       - "5440:5432"
     volumes:
       - postgres-volume:/var/lib/psql/data
+  seq:
+    image: datalust/seq:latest
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - "5340:80"
+    volumes:
+      - seq-data:/var/lib/seq/data
 
 volumes:
   postgres-volume:
+  seq-data:
