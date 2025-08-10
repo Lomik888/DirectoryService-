@@ -1,6 +1,9 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Runtime.InteropServices;
+using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Abstractions;
 using DirectoryService.Domain.DepartmentValueObjects;
-using DirectoryService.Domain.Error;
+using DirectoryService.Domain.Err;
+using DirectoryService.Domain.LocationValueObjects;
 using Path = DirectoryService.Domain.DepartmentValueObjects.Path;
 
 namespace DirectoryService.Domain;
@@ -8,8 +11,8 @@ namespace DirectoryService.Domain;
 public sealed class Department : Entity<DepartmentId>
 {
     private readonly List<Department> _departments = [];
-    private readonly List<Location> _locations = [];
-    private readonly List<Position> _positions = [];
+    private readonly List<DepartmentsLocations> _departmentsLocations = [];
+    private readonly List<DepartmentsPositions> _departmentsPositions = [];
 
     public DepartmentName Name { get; private set; }
 
@@ -31,42 +34,142 @@ public sealed class Department : Entity<DepartmentId>
 
     public IReadOnlyList<Department> ChildrenDepartments => _departments;
 
-    public IReadOnlyList<Location> Locations => _locations;
+    public IReadOnlyList<DepartmentsLocations> DepartmentsLocations => _departmentsLocations;
 
-    public IReadOnlyList<Position> Positions => _positions;
+    public IReadOnlyList<DepartmentsPositions> DepartmentsPositions => _departmentsPositions;
 
-    private Department(
-        DepartmentName name,
-        Identifier identifier,
-        Path path,
-        DateTime createdAt)
+    private Department()
     {
-        Id = DepartmentId.Create();
-        Name = name;
-        Identifier = identifier;
-        IsActive = true;
-        CreatedAt = createdAt;
-        UpdatedAt = createdAt;
-        ChildrenCount = ChildrenDepartments.Count;
-        Path = path;
-        Depth = Path.GetDepth();
     }
 
-    public static Result<Department, Error.Error> Create(
+    private Department(
+        DepartmentId departmentId,
         DepartmentName name,
         Identifier identifier,
+        DepartmentId? parentId,
         Path path,
-        DateTime createdAt)
+        short depth,
+        int childrenCount,
+        bool isActive,
+        DateTime createdAt,
+        DateTime updatedAt)
     {
+        Id = departmentId;
+        Name = name;
+        Identifier = identifier;
+        ParentId = parentId;
+        Path = path;
+        Depth = depth;
+        ChildrenCount = childrenCount;
+        IsActive = isActive;
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
+    }
+
+    public static Result<Department, Error> CreateParent(
+        DepartmentName name,
+        Identifier identifier,
+        IClock clock)
+    {
+        var createdAt = clock.UtcNow();
+
         if (createdAt.Kind is not DateTimeKind.Utc)
         {
-            var error = Error.Error.Create(
+            var error = Error.Create(
                 $"{nameof(createdAt)} must be UTC.",
                 "invalid.parameter",
                 ErrorTypes.VALIDATION);
             return error;
         }
 
-        return new Department(name, identifier, path, createdAt);
+        var departmentId = DepartmentId.Create();
+        var path = Path.Create($"{identifier.Value}/").Value;
+        var depth = (short)0;
+        var childrenCount = 0;
+        var isActive = true;
+        var updatedAt = createdAt;
+
+
+        return new Department(
+            departmentId,
+            name,
+            identifier,
+            null,
+            path,
+            depth,
+            childrenCount,
+            isActive,
+            createdAt,
+            updatedAt);
+    }
+
+    public Result<Department, Error> AddChild(
+        DepartmentName name,
+        Identifier identifier,
+        IClock clock)
+    {
+        var identifierExists = this.Path.ValidateChildPath(identifier);
+        if (identifierExists.IsFailure == true)
+        {
+            return identifierExists.Error;
+        }
+
+        var childCreatedAt = clock.UtcNow();
+
+        if (childCreatedAt.Kind is not DateTimeKind.Utc)
+        {
+            var error = Error.Create(
+                $"{nameof(childCreatedAt)} must be UTC.",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION);
+            return error;
+        }
+
+        var children = CreateChild(
+            name,
+            identifier,
+            childCreatedAt);
+
+        this.ChildrenCount += 1;
+        this._departments.Add(children);
+        this.UpdatedAt = childCreatedAt;
+
+        return children;
+    }
+
+    public void AddLocations(IEnumerable<LocationId> locationId)
+    {
+        var departmentsLocations =
+            locationId.Select(x => new DepartmentsLocations(this.Id, x));
+
+        _departmentsLocations.AddRange(departmentsLocations);
+    }
+
+    private Department CreateChild(
+        DepartmentName name,
+        Identifier identifier,
+        DateTime createdAt)
+    {
+        var departmentId = DepartmentId.Create();
+        var parentId = this.Id;
+        var path = Path.Create(this.Path, identifier.Value).Value;
+        var depth = (short)(1 + this.Depth);
+        var childrenCount = 0;
+        var isActive = true;
+        var updatedAt = createdAt;
+
+        var children = new Department(
+            departmentId,
+            name,
+            identifier,
+            parentId,
+            path,
+            depth,
+            childrenCount,
+            isActive,
+            createdAt,
+            updatedAt);
+
+        return children;
     }
 }
