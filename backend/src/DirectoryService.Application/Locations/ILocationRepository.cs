@@ -10,4 +10,8 @@ public interface ILocationRepository
     Task SaveChangesAsync(CancellationToken cancellationToken);
 
     Task<bool> LocationExistsAsync(LocationName locationName, Address address, CancellationToken cancellationToken);
+
+    Task<List<LocationId>> LocationsExistsAsync(
+        IEnumerable<LocationId> locationIds,
+        CancellationToken cancellationToken);
 }
