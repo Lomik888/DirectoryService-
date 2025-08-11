@@ -1,12 +1,14 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Error;
+using DirectoryService.Domain.Abstractions;
+using DirectoryService.Domain.DepartmentValueObjects;
+using DirectoryService.Domain.Err;
 using DirectoryService.Domain.PositionValueObjects;
 
 namespace DirectoryService.Domain;
 
 public sealed class Position : Entity<PositionId>
 {
-    private readonly List<Department> _departments = [];
+    private readonly List<DepartmentsPositions> _departmentsPositions = [];
 
     public PositionName Name { get; private set; }
 
@@ -18,7 +20,11 @@ public sealed class Position : Entity<PositionId>
 
     public DateTime UpdatedAt { get; private set; }
 
-    public IReadOnlyList<Department> Departments => _departments;
+    public IReadOnlyList<DepartmentsPositions> DepartmentsPositions => _departmentsPositions;
+
+    private Position()
+    {
+    }
 
     private Position(
         PositionName name,
@@ -33,14 +39,16 @@ public sealed class Position : Entity<PositionId>
         UpdatedAt = createdAt;
     }
 
-    public static Result<Position, Error.Error> Create(
+    public static Result<Position, Error> Create(
         PositionName name,
         Description? description,
-        DateTime createdAt)
+        IClock clock)
     {
+        var createdAt = clock.UtcNow();
+
         if (createdAt.Kind is not DateTimeKind.Utc)
         {
-            var error = Error.Error.Create(
+            var error = Error.Create(
                 $"{nameof(createdAt)} must be UTC.",
                 "invalid.parameter",
                 ErrorTypes.VALIDATION);
@@ -48,5 +56,13 @@ public sealed class Position : Entity<PositionId>
         }
 
         return new Position(name, description, createdAt);
+    }
+
+    public void AddDepartments(IEnumerable<DepartmentId> departments)
+    {
+        var departmentsPositions =
+            departments.Select(x => new DepartmentsPositions(x, this.Id));
+
+        _departmentsPositions.AddRange(departmentsPositions);
     }
 }

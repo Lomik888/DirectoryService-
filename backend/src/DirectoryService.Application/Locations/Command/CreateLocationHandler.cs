@@ -3,7 +3,7 @@ using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Extations;
 using DirectoryService.Domain;
 using DirectoryService.Domain.Abstractions;
-using DirectoryService.Domain.Error;
+using DirectoryService.Domain.Err;
 using DirectoryService.Domain.Extations;
 using DirectoryService.Domain.LocationValueObjects;
 using FluentValidation;

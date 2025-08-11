@@ -75,33 +75,5 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .IsRequired(false)
             .HasForeignKey(x => x.ParentId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasMany(x => x.Positions)
-            .WithMany(x => x.Departments)
-            .UsingEntity(
-                "departments_position",
-                r => r
-                    .HasOne(typeof(Position))
-                    .WithMany()
-                    .HasForeignKey("position_id"),
-                l => l
-                    .HasOne(typeof(Department))
-                    .WithMany()
-                    .HasForeignKey("department_id"),
-                j => j.HasKey("position_id", "department_id"));
-
-        builder.HasMany(x => x.Locations)
-            .WithMany(x => x.Departments)
-            .UsingEntity(
-                "departments_locations",
-                r => r
-                    .HasOne(typeof(Location))
-                    .WithMany()
-                    .HasForeignKey("location_id"),
-                l => l
-                    .HasOne(typeof(Department))
-                    .WithMany()
-                    .HasForeignKey("department_id"),
-                j => j.HasKey("location_id", "department_id"));
     }
 }

@@ -1,5 +1,7 @@
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
+using DirectoryService.Application.Positions;
 using DirectoryService.Infrastructure.Options;
 using DirectoryService.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +20,9 @@ public static class DependencyInjection
 
     private static void AddRepositories(this IServiceCollection services)
     {
+        services.AddScoped<IPositionRepository, PositionRepository>();
         services.AddScoped<ILocationRepository, LocationRepository>();
+        services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
     }
 
     private static void AddDatabase(this IServiceCollection services, IConfiguration configuration)

@@ -2,7 +2,7 @@
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Locations.Command;
 using DirectoryService.Contracts.Requests;
-using DirectoryService.Domain.Error;
+using DirectoryService.Domain.Err;
 using DirectoryService.Presentation.Responses;
 using Microsoft.AspNetCore.Mvc;
 

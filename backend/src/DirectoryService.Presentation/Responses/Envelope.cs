@@ -1,4 +1,4 @@
-﻿using DirectoryService.Domain.Error;
+﻿using DirectoryService.Domain.Err;
 
 namespace DirectoryService.Presentation.Responses;
 

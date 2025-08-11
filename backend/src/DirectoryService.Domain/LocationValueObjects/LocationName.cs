@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Error;
+using DirectoryService.Domain.Err;
 
 namespace DirectoryService.Domain.LocationValueObjects;
 
@@ -15,7 +15,7 @@ public class LocationName : ValueObject
         Value = value;
     }
 
-    public static Result<LocationName, IEnumerable<Error.Error>> Create(string value)
+    public static Result<LocationName, IEnumerable<Error>> Create(string value)
     {
         var errors = Validate(value);
 
@@ -25,13 +25,13 @@ public class LocationName : ValueObject
         return new LocationName(value);
     }
 
-    public static List<Error.Error> Validate(string value)
+    public static List<Error> Validate(string value)
     {
-        var errors = new List<Error.Error>();
+        var errors = new List<Error>();
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            errors.Add(Error.Error.Create(
+            errors.Add(Error.Create(
                 "Имя локации не может быть пустым",
                 "invalid.parameter",
                 ErrorTypes.VALIDATION));
@@ -39,7 +39,7 @@ public class LocationName : ValueObject
 
         if (value.Length < NAME_MIN_LENGHT || value.Length > NAME_MAX_LENGHT)
         {
-            errors.Add(Error.Error.Create(
+            errors.Add(Error.Create(
                 $"Имя локации должно быть {NAME_MIN_LENGHT}-{NAME_MAX_LENGHT} символов",
                 "invalid.parameter",
                 ErrorTypes.VALIDATION));

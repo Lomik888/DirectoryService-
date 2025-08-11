@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Abstractions;
-using DirectoryService.Domain.Error;
+using DirectoryService.Domain.Err;
 using DirectoryService.Domain.LocationValueObjects;
 
 namespace DirectoryService.Domain;
@@ -8,7 +8,7 @@ namespace DirectoryService.Domain;
 public sealed class Location : Entity<LocationId>
 {
     private List<Address> _addresses = [];
-    private List<Department> _departments = [];
+    private readonly List<DepartmentsLocations> _departmentsLocations = [];
 
     public LocationName Name { get; private set; }
 
@@ -22,7 +22,7 @@ public sealed class Location : Entity<LocationId>
 
     public IReadOnlyList<Address> Addresses => _addresses;
 
-    public IReadOnlyList<Department> Departments => _departments;
+    public IReadOnlyList<DepartmentsLocations> DepartmentsLocations => _departmentsLocations;
 
     private Location()
     {
@@ -43,7 +43,7 @@ public sealed class Location : Entity<LocationId>
         UpdatedAt = createdAt;
     }
 
-    public static Result<Location, Error.Error> Create(
+    public static Result<Location, Error> Create(
         LocationName name,
         Timezone timezone,
         Address address,
@@ -53,7 +53,7 @@ public sealed class Location : Entity<LocationId>
 
         if (createdAt.Kind is not DateTimeKind.Utc)
         {
-            var error = Error.Error.Create(
+            var error = Error.Create(
                 $"{nameof(createdAt)} must be UTC.",
                 "invalid.parameter",
                 ErrorTypes.VALIDATION);
@@ -63,11 +63,11 @@ public sealed class Location : Entity<LocationId>
         return new Location(name, timezone, address, createdAt);
     }
 
-    public UnitResult<Error.Error> AddAddress(Address address)
+    public UnitResult<Error> AddAddress(Address address)
     {
         if (Addresses.Contains(address))
         {
-            var error = Error.Error.Create(
+            var error = Error.Create(
                 $"{nameof(address)} is already added.",
                 "invalid.parameter",
                 ErrorTypes.VALIDATION);
@@ -75,6 +75,6 @@ public sealed class Location : Entity<LocationId>
         }
 
         _addresses.Add(address);
-        return UnitResult.Success<Error.Error>();
+        return UnitResult.Success<Error>();
     }
 }
