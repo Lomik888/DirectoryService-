@@ -32,7 +32,7 @@ public class TransactionManager<T> : ITransactionManager
     {
         try
         {
-            await using var dbTransaction = await _dbContext.Database.BeginTransactionAsync(
+            var dbTransaction = await _dbContext.Database.BeginTransactionAsync(
                 isolationLevel,
                 cancellationToken);
 
