@@ -7,7 +7,7 @@ namespace DirectoryService.Application.Departments;
 
 public interface IDepartmentsRepository
 {
-    Task<Result<Department, Errors>> GetByIdWithoutNavidationsProperties(
+    Task<Result<Department, Errors>> GetByIdAsync(
         DepartmentId id,
         CancellationToken cancellationToken);
 

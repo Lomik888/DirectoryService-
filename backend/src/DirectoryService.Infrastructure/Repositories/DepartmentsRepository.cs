@@ -17,7 +17,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         _context = context;
     }
 
-    public async Task<Result<Department, Errors>> GetByIdWithoutNavidationsProperties(
+    public async Task<Result<Department, Errors>> GetByIdAsync(
         DepartmentId id,
         CancellationToken cancellationToken)
     {

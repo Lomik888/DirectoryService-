@@ -120,7 +120,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, Errors, CreateDepar
         var departmentId = DepartmentId.Create((Guid)command.Request.ParentId!).Value;
 
         var parentResult =
-            await _departmentsRepository.GetByIdWithoutNavidationsProperties(departmentId, cancellationToken);
+            await _departmentsRepository.GetByIdAsync(departmentId, cancellationToken);
         if (parentResult.IsFailure == true)
         {
             return parentResult.Error;
