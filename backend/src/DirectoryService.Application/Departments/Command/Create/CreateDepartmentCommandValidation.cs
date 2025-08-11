@@ -22,7 +22,7 @@ public class CreateDepartmentCommandValidation : AbstractValidator<CreateDepartm
             .WithMessage(GeneralErrors.Validation.InvalidField(
                 "Коллекция LocationIds не может быть пустой",
                 "invalid.request.field"))
-            .DependentRules(() =>
+            .DependentRules( () =>
             {
                 RuleFor(x => x.Request.LocationIds).Must(x => x.Count == x.Distinct().Count())
                     .WithMessage(GeneralErrors.Validation.InvalidField(
