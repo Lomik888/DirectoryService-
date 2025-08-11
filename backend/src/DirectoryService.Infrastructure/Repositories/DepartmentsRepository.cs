@@ -35,7 +35,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         return department;
     }
 
-    public async Task<Result<Department, Errors>> GetByIdAsync(DepartmentId id, CancellationToken cancellationToken)
+    public async Task<Result<Department, Errors>> GetByIdWithLocationsAsync(DepartmentId id, CancellationToken cancellationToken)
     {
         var department = await _context.Departments
             .Where(x => x.Id == id && x.IsActive)

@@ -11,7 +11,7 @@ public interface IDepartmentsRepository
         DepartmentId id,
         CancellationToken cancellationToken);
 
-    Task<Result<Department, Errors>> GetByIdAsync(
+    Task<Result<Department, Errors>> GetByIdWithLocationsAsync(
         DepartmentId id,
         CancellationToken cancellationToken);
 

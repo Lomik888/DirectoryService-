@@ -75,7 +75,7 @@ public class UpdateDepartmentsLocationsHandler : ICommandHandler<Guid, Errors, U
                 return errors;
             }
 
-            var departmentResult = await _departmentsRepository.GetByIdAsync(departmentId, cancellationToken);
+            var departmentResult = await _departmentsRepository.GetByIdWithLocationsAsync(departmentId, cancellationToken);
             if (departmentResult.IsFailure == true)
             {
                 var errors = departmentResult.Error;
