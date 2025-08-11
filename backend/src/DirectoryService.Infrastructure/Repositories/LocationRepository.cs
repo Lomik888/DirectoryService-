@@ -40,6 +40,18 @@ public class LocationRepository : ILocationRepository
         return result;
     }
 
+    public async Task<List<LocationId>> LocationsIsActiveAndExistsAsync(
+        List<LocationId> ids,
+        CancellationToken cancellationToken)
+    {
+        var validLocations = await _context.Locations
+            .Where(x => ids.Contains(x.Id) && x.IsActive)
+            .Select(x => x.Id)
+            .ToListAsync(cancellationToken);
+
+        return validLocations;
+    }
+
     public async Task<List<LocationId>> LocationsExistsAsync(
         IEnumerable<LocationId> locationIds,
         CancellationToken cancellationToken)
