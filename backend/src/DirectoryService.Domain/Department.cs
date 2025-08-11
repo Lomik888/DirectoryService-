@@ -137,12 +137,31 @@ public sealed class Department : Entity<DepartmentId>
         return children;
     }
 
-    public void AddLocations(IEnumerable<LocationId> locationId)
+    public void AddLocations(List<LocationId> locationId)
     {
         var departmentsLocations =
             locationId.Select(x => new DepartmentsLocations(this.Id, x));
 
         _departmentsLocations.AddRange(departmentsLocations);
+    }
+
+    public void AddLocationsWithClear(List<LocationId> locationId)
+    {
+        var departmentsLocations = _departmentsLocations.ToList();
+
+        foreach (var dl in departmentsLocations)
+        {
+            if (locationId.Contains(dl.LocationId) == false)
+            {
+                _departmentsLocations.Remove(dl);
+            }
+            else
+            {
+                locationId.Remove(dl.LocationId);
+            }
+        }
+
+        this.AddLocations(locationId);
     }
 
     private Department CreateChild(
