@@ -61,4 +61,23 @@ public class CustomResult<T> : IActionResult
 
         return customResult;
     }
+
+    public static implicit operator CustomResult<T>(UnitResult<Errors> result)
+    {
+        Envelope<T> envelope;
+        CustomResult<T> customResult;
+
+        if (result.IsSuccess == true)
+        {
+            envelope = Envelope<T>.Ok();
+            customResult = new CustomResult<T>(envelope);
+        }
+        else
+        {
+            envelope = Envelope<T>.Error(result.Error);
+            customResult = new CustomResult<T>(envelope);
+        }
+
+        return customResult;
+    }
 }
