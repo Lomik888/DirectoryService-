@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Extations;
+using DirectoryService.Application.Locations;
 using DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryService.Domain.Err;
 using DirectoryService.Domain.Extations;
@@ -17,17 +18,20 @@ public class UpdateDepartmentsLocationsHandler : ICommandHandler<Guid, Errors, U
     private readonly ILogger<UpdateDepartmentsLocationsHandler> _logger;
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ITransactionManager _transactionManager;
+    private readonly ILocationRepository _locationRepository;
 
     public UpdateDepartmentsLocationsHandler(
         IValidator<UpdateDepartmentsLocationsCommand> validator,
         ILogger<UpdateDepartmentsLocationsHandler> logger,
         IDepartmentsRepository departmentsRepository,
-        ITransactionManager transactionManager)
+        ITransactionManager transactionManager,
+        ILocationRepository locationRepository)
     {
         _validator = validator;
         _logger = logger;
         _departmentsRepository = departmentsRepository;
         _transactionManager = transactionManager;
+        _locationRepository = locationRepository;
     }
 
     public async Task<Result<Guid, Errors>> HandleAsync(
@@ -46,7 +50,6 @@ public class UpdateDepartmentsLocationsHandler : ICommandHandler<Guid, Errors, U
             .Select(x => LocationId.Create(x).Value)
             .ToList();
 
-        // Это чтобы у меня были консистентные данные в бд
         var transactionResult = await _transactionManager.BeginTransactionAsync(
             cancellationToken,
             IsolationLevel.Serializable);
@@ -57,75 +60,10 @@ public class UpdateDepartmentsLocationsHandler : ICommandHandler<Guid, Errors, U
 
         await using var transaction = transactionResult.Value;
 
-        try
+        var locationsIsValidResult = await ValidateLocationIdsAsync(locationsIds, cancellationToken);
+        if (locationsIsValidResult.IsFailure == true)
         {
-            var locationsIsValidResult =
-                await _validator.ValidateAsync(command, cancellation: cancellationToken, options: options =>
-                    options.IncludeRuleSets(UpdateDepartmentsLocationsCommandValidator.DB_VALIDATION));
-            if (locationsIsValidResult.IsValid == false)
-            {
-                var errors = Errors.Create(locationsIsValidResult.Errors.ToErrors());
-                var rollbackResult = await transaction.RollbackAsync(cancellationToken);
-                if (rollbackResult.IsFailure == true)
-                {
-                    errors.Add(rollbackResult.Error);
-                    return errors;
-                }
-
-                return errors;
-            }
-
-            var departmentResult = await _departmentsRepository.GetByIdWithLocationsAsync(departmentId, cancellationToken);
-            if (departmentResult.IsFailure == true)
-            {
-                var errors = departmentResult.Error;
-                var rollbackResult = await transaction.RollbackAsync(cancellationToken);
-                if (rollbackResult.IsFailure == true)
-                {
-                    errors.Add(rollbackResult.Error);
-                    return errors;
-                }
-
-                return errors;
-            }
-
-            var department = departmentResult.Value;
-
-            department.AddLocationsWithClear(locationsIds);
-
-            var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
-            if (saveChangesResult.IsFailure == true)
-            {
-                var errors = saveChangesResult.Error;
-                var rollbackResult = await transaction.RollbackAsync(cancellationToken);
-                if (rollbackResult.IsFailure == true)
-                {
-                    errors.Add(rollbackResult.Error);
-                    return errors;
-                }
-
-                return errors;
-            }
-
-            var commitResult = await transaction.CommitAsync(cancellationToken);
-            if (commitResult.IsFailure == true)
-            {
-                var errors = commitResult.Error;
-                var rollbackResult = await transaction.RollbackAsync(cancellationToken);
-                if (rollbackResult.IsFailure == true)
-                {
-                    errors.Add(rollbackResult.Error);
-                    return errors;
-                }
-
-                return errors;
-            }
-
-            return departmentId.Value;
-        }
-        catch (Exception ex)
-        {
-            var errors = GeneralErrors.Database.TransactionError(ex.Message).ToErrors();
+            var errors = locationsIsValidResult.Error;
             var rollbackResult = await transaction.RollbackAsync(cancellationToken);
             if (rollbackResult.IsFailure == true)
             {
@@ -133,9 +71,73 @@ public class UpdateDepartmentsLocationsHandler : ICommandHandler<Guid, Errors, U
                 return errors;
             }
 
-            _logger.LogError(ex, "Error during transaction");
+            return errors;
+        }
+
+        var departmentResult = await _departmentsRepository.GetByIdWithLocationsAsync(departmentId, cancellationToken);
+        if (departmentResult.IsFailure == true)
+        {
+            var errors = departmentResult.Error;
+            var rollbackResult = await transaction.RollbackAsync(cancellationToken);
+            if (rollbackResult.IsFailure == true)
+            {
+                errors.Add(rollbackResult.Error);
+                return errors;
+            }
 
             return errors;
         }
+
+        var department = departmentResult.Value;
+
+        department.AddLocationsWithClear(locationsIds);
+
+        var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+        if (saveChangesResult.IsFailure == true)
+        {
+            var errors = saveChangesResult.Error;
+            var rollbackResult = await transaction.RollbackAsync(cancellationToken);
+            if (rollbackResult.IsFailure == true)
+            {
+                errors.Add(rollbackResult.Error);
+                return errors;
+            }
+
+            return errors;
+        }
+
+        var commitResult = await transaction.CommitAsync(cancellationToken);
+        if (commitResult.IsFailure == true)
+        {
+            var errors = commitResult.Error;
+            var rollbackResult = await transaction.RollbackAsync(cancellationToken);
+            if (rollbackResult.IsFailure == true)
+            {
+                errors.Add(rollbackResult.Error);
+                return errors;
+            }
+
+            return errors;
+        }
+
+        return departmentId.Value;
+    }
+
+    private async Task<UnitResult<Errors>> ValidateLocationIdsAsync(List<LocationId> ids,
+        CancellationToken cancellationToken)
+    {
+        var validIds = await _locationRepository.LocationsIsActiveAndExistsAsync(ids, cancellationToken);
+        if (ids.Count != validIds.Count)
+        {
+            var invalidIds = ids.Except(validIds);
+
+            var idsMessage = string.Join(", ", invalidIds.Select(x => x.Value));
+            var error = Error.Create(
+                $"Ids локаций {idsMessage} не являются активными или не сущессвуют",
+                "invalid.locations.ids", ErrorTypes.VALIDATION);
+            return error.ToErrors();
+        }
+
+        return UnitResult.Success<Errors>();
     }
 }
