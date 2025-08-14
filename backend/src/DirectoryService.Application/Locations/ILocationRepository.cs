@@ -11,6 +11,10 @@ public interface ILocationRepository
 
     Task<bool> LocationExistsAsync(LocationName locationName, Address address, CancellationToken cancellationToken);
 
+    Task<List<LocationId>> LocationsIsActiveAndExistsAsync(
+        List<LocationId> ids,
+        CancellationToken cancellationToken);
+
     Task<List<LocationId>> LocationsExistsAsync(
         IEnumerable<LocationId> locationIds,
         CancellationToken cancellationToken);

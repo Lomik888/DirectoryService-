@@ -20,6 +20,11 @@ public class Errors : IEnumerable<Error>
         return errors;
     }
 
+    public void Add(Errors errors)
+    {
+        this._errors.AddRange(errors.Values);
+    }
+
     public IEnumerator<Error> GetEnumerator()
     {
         return _errors.GetEnumerator();

@@ -147,7 +147,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, Errors, CreateDepar
 
     private void AddLocations(Department department, List<Guid> locationIds)
     {
-        var locationsIds = locationIds.Select(x => LocationId.Create(x).Value);
+        var locationsIds = locationIds.Select(x => LocationId.Create(x).Value).ToList();
 
         department.AddLocations(locationsIds);
     }

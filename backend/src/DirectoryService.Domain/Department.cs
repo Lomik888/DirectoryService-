@@ -11,7 +11,7 @@ namespace DirectoryService.Domain;
 public sealed class Department : Entity<DepartmentId>
 {
     private readonly List<Department> _departments = [];
-    private readonly List<DepartmentsLocations> _departmentsLocations = [];
+    private List<DepartmentsLocations> _departmentsLocations = [];
     private readonly List<DepartmentsPositions> _departmentsPositions = [];
 
     public DepartmentName Name { get; private set; }
@@ -137,12 +137,20 @@ public sealed class Department : Entity<DepartmentId>
         return children;
     }
 
-    public void AddLocations(IEnumerable<LocationId> locationId)
+    public void AddLocations(List<LocationId> locationId)
     {
         var departmentsLocations =
             locationId.Select(x => new DepartmentsLocations(this.Id, x));
 
         _departmentsLocations.AddRange(departmentsLocations);
+    }
+
+    public void AddLocationsWithClear(List<LocationId> locationId)
+    {
+        var departmentsLocations =
+            locationId.Select(x => new DepartmentsLocations(this.Id, x)).ToList();
+
+        this._departmentsLocations = departmentsLocations;
     }
 
     private Department CreateChild(

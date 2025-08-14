@@ -21,7 +21,26 @@ public class DepartmentsRepository : IDepartmentsRepository
         DepartmentId id,
         CancellationToken cancellationToken)
     {
-        var department = await _context.Departments.SingleOrDefaultAsync(d => d.Id == id, cancellationToken);
+        var department = await _context.Departments
+            .Where(x => x.Id == id && x.IsActive)
+            .SingleOrDefaultAsync(cancellationToken);
+        if (department == null)
+        {
+            var error = GeneralErrors.Validation.NotFound(
+                $"Department with id: {id.Value} was not found",
+                "not.found");
+            return error.ToErrors();
+        }
+
+        return department;
+    }
+
+    public async Task<Result<Department, Errors>> GetByIdWithLocationsAsync(DepartmentId id, CancellationToken cancellationToken)
+    {
+        var department = await _context.Departments
+            .Where(x => x.Id == id && x.IsActive)
+            .Include(x => x.DepartmentsLocations)
+            .SingleOrDefaultAsync(cancellationToken);
         if (department == null)
         {
             var error = GeneralErrors.Validation.NotFound(
@@ -47,6 +66,17 @@ public class DepartmentsRepository : IDepartmentsRepository
             .Where(x => (ids.Contains(x.Id) == true && x.IsActive == true) == true)
             .Select(x => x.Id)
             .ToListAsync(cancellationToken);
+
+        return departmentExists;
+    }
+
+    public async Task<bool> DepartmentIsActiveAndExistsAsync(
+        DepartmentId id,
+        CancellationToken cancellationToken)
+    {
+        var departmentExists = await _context.Departments
+            .Where(x => id == x.Id && x.IsActive == true)
+            .AnyAsync(cancellationToken);
 
         return departmentExists;
     }
