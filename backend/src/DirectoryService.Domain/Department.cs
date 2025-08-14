@@ -3,6 +3,7 @@ using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Abstractions;
 using DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryService.Domain.Err;
+using DirectoryService.Domain.Extations;
 using DirectoryService.Domain.LocationValueObjects;
 using Path = DirectoryService.Domain.DepartmentValueObjects.Path;
 
@@ -101,6 +102,77 @@ public sealed class Department : Entity<DepartmentId>
             isActive,
             createdAt,
             updatedAt);
+    }
+
+    public UnitResult<Errors> MakeParent(IClock clock)
+    {
+        var updatedAt = clock.UtcNow();
+
+        if (updatedAt.Kind is not DateTimeKind.Utc)
+        {
+            var error = Error.Create(
+                $"{nameof(updatedAt)} must be UTC.",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION);
+            return error.ToErrors();
+        }
+
+        this.ParentId = null;
+        this.Depth = 0;
+        var newPathResult = Path.CreateParent(this.Path, this.Identifier);
+        if (newPathResult.IsFailure == true)
+        {
+            return newPathResult.Error;
+        }
+
+        this.Path = newPathResult.Value;
+
+        return UnitResult.Success<Errors>();
+    }
+
+    public UnitResult<Errors> AddChild(
+        Department child,
+        IClock clock)
+    {
+        var parent = this;
+        var updatedAt = clock.UtcNow();
+
+        if (updatedAt.Kind is not DateTimeKind.Utc)
+        {
+            var error = Error.Create(
+                $"{nameof(updatedAt)} must be UTC.",
+                "invalid.parameter",
+                ErrorTypes.VALIDATION);
+            return error.ToErrors();
+        }
+
+        if (parent.Depth > 0)
+        {
+            if (parent.Path.Value.StartsWith(child.Path.Value) == true)
+            {
+                var error = GeneralErrors.Validation.InvalidField(
+                    "Родитель ссылается на дочерний департамент",
+                    "validation.invalid");
+                return error.ToErrors();
+            }
+        }
+
+        parent._departments.Add(child);
+        var newChildPathResult = Path.Create(parent.Path, child.Path, child.Identifier);
+        if (newChildPathResult.IsFailure == true)
+        {
+            return newChildPathResult.Error;
+        }
+
+        child.Path = newChildPathResult.Value;
+        child.ParentId = parent.Id;
+        child.UpdatedAt = updatedAt;
+        child.Depth += parent.Depth;
+
+        parent.ChildrenCount += child.ChildrenCount + 1;
+        parent.UpdatedAt = updatedAt;
+
+        return UnitResult.Success<Errors>();
     }
 
     public Result<Department, Error> AddChild(

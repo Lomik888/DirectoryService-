@@ -1,7 +1,7 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Departments.Command;
+using DirectoryService.Application.Departments.Command.Transfer;
 using DirectoryService.Application.Departments.Command.UpdateLocations;
-using DirectoryService.Application.Locations.Command;
 using DirectoryService.Contracts.Requests;
 using DirectoryService.Domain.Err;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +29,19 @@ public class DepartmentsController : ApplicationController
         return (await handler.HandleAsync(
                 new UpdateDepartmentsLocationsCommand(departmentId, request),
                 cancellationToken),
-            StatusCodes.Status201Created);
+            StatusCodes.Status200OK);
+    }
+
+
+    [HttpPut("/departments/{departmentId::guid}/parent")]
+    public async Task<CustomResult<Guid>> TransferAsync(
+        [FromRoute] Guid departmentId,
+        [FromBody] TransferDepartmentRequest request,
+        [FromServices] ICommandHandler<Errors, TransferDepartmentCommand> handler,
+        CancellationToken cancellationToken)
+    {
+        return await handler.HandleAsync(
+            new TransferDepartmentCommand(departmentId, request.ParentId),
+            cancellationToken);
     }
 }

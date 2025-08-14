@@ -46,9 +46,10 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, Errors, CreateDepar
             return Errors.Create(validationResult.Errors.ToErrors());
         }
 
-        var locationsIds = command.Request.LocationIds.Select(x => LocationId.Create(x).Value);
+        var locationsIds = command.Request.LocationIds.Select(x => LocationId.Create(x).Value).ToList();
 
-        var locationsNotExists = await _locationRepository.LocationsExistsAsync(locationsIds, cancellationToken);
+        var locationsNotExists =
+            await _locationRepository.LocationsIsActiveAndExistsAsync(locationsIds, cancellationToken);
         if (locationsNotExists.Count > 0)
         {
             var ids = locationsNotExists.Select(x => x.Value);

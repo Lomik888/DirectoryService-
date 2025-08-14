@@ -5,6 +5,7 @@ using DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryService.Domain.Err;
 using DirectoryService.Domain.Extations;
 using Microsoft.EntityFrameworkCore;
+using Path = DirectoryService.Domain.DepartmentValueObjects.Path;
 
 namespace DirectoryService.Infrastructure.Repositories;
 
@@ -15,6 +16,28 @@ public class DepartmentsRepository : IDepartmentsRepository
     public DepartmentsRepository(DirectoryServiceDbContext context)
     {
         _context = context;
+    }
+
+    public async Task MinusChildrenCountAsync(DepartmentId departmentId, int count, CancellationToken cancellationToken)
+    {
+        await _context.Database.ExecuteSqlInterpolatedAsync(
+            $"""
+                update department.departments
+                set children_count = children_count - {count}
+                where id = {departmentId.Value};
+             """, cancellationToken);
+    }
+
+    public async Task UpdatePathsAndDephtsAsync(Path old, Path @new, CancellationToken cancellationToken)
+    {
+        await _context.Database.ExecuteSqlInterpolatedAsync(
+            $"""
+                update department.departments
+                    set path = {@new.Value} || substring(path FROM char_length({old.Value}) + 1),
+                        depth = length({@new.Value} || substring(path FROM char_length({old.Value}) + 1))
+                                - length(replace({@new.Value} || substring(path FROM char_length({old.Value}) + 1), '/', ''))
+                    where path like {old.Value + "%"};
+             """, cancellationToken);
     }
 
     public async Task<Result<Department, Errors>> GetByIdAsync(
@@ -35,7 +58,8 @@ public class DepartmentsRepository : IDepartmentsRepository
         return department;
     }
 
-    public async Task<Result<Department, Errors>> GetByIdWithLocationsAsync(DepartmentId id, CancellationToken cancellationToken)
+    public async Task<Result<Department, Errors>> GetByIdWithLocationsAsync(DepartmentId id,
+        CancellationToken cancellationToken)
     {
         var department = await _context.Departments
             .Where(x => x.Id == id && x.IsActive)

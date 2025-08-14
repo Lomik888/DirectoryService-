@@ -1,4 +1,5 @@
-﻿using DirectoryService.Domain.Err;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Err;
 
 namespace DirectoryService.Presentation.Responses;
 
@@ -42,7 +43,11 @@ public class Envelope<T>
 
     public static Envelope<T> Ok(T? result) => Envelope<T>.Create(result, null);
 
+    public static Envelope<T> Ok() => Envelope<T>.Create(default, null);
+
     public static Envelope<T> Error(Errors errors) => Envelope<T>.Create(default, errors);
+
+    public static Envelope<T> Error(UnitResult<Errors> result) => Envelope<T>.Create(default, result.Error);
 
     private int GetStatusCode(string errorType)
     {
