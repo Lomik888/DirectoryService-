@@ -40,6 +40,12 @@ public class LocationRepository : ILocationRepository
         return result;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Невалидные локации</returns>
     public async Task<List<LocationId>> LocationsIsActiveAndExistsAsync(
         List<LocationId> ids,
         CancellationToken cancellationToken)
@@ -49,7 +55,9 @@ public class LocationRepository : ILocationRepository
             .Select(x => x.Id)
             .ToListAsync(cancellationToken);
 
-        return validLocations;
+        var invalidLocations = ids.Except(validLocations).ToList();
+
+        return invalidLocations;
     }
 
     public async Task<List<LocationId>> LocationsExistsAsync(
